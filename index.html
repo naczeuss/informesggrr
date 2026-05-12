@@ -3,40 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Partes Diarios V8.1</title>
+
+<title>Partes Diarios V9</title>
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
-body{margin:0;font-family:Segoe UI,sans-serif;background:#eef3f8}
-.top{background:#0088cc;color:#fff;padding:12px;text-align:center;font-size:22px;font-weight:bold}
-.wrap{max-width:1100px;margin:auto;padding:15px}
-#a4{width:190mm;background:#fff;margin:auto;padding:10mm;box-sizing:border-box}
-.card{border:1px solid #ccc;border-radius:10px;padding:12px;margin-bottom:12px;page-break-inside:avoid}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
-.field{display:flex;flex-direction:column}
-label{font-size:12px;font-weight:700;margin-bottom:4px}
-input,select{padding:8px;border:1px solid #ccc;border-radius:8px}
-.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:15px}
-button{background:#0088cc;color:#fff;border:none;padding:12px 18px;border-radius:10px;font-weight:700;cursor:pointer}
-.ql-editor{min-height:120px;overflow:visible!important}
-.hidden{display:none}
-.print-header{background:#0088cc;color:#fff;text-align:center;padding:8px;font-size:22px;font-weight:bold;margin-bottom:14px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
-@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}#a4{width:100%}}
-@media(max-width:600px){.grid{grid-template-columns:1fr}}
+
+body{
+margin:0;
+font-family:Segoe UI,sans-serif;
+background:#eef3f8;
+}
+
+.top{
+background:#0088cc;
+color:white;
+padding:12px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+}
+
+.wrap{
+max-width:1100px;
+margin:auto;
+padding:15px;
+}
+
+#a4{
+width:180mm;
+background:white;
+margin:0 auto;
+padding:8mm;
+box-sizing:border-box;
+}
+
+.print-header{
+background:#0088cc;
+color:white;
+padding:8px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+margin-bottom:12px;
+-webkit-print-color-adjust:exact;
+print-color-adjust:exact;
+}
+
+.card{
+border:1px solid #d7d7d7;
+border-radius:10px;
+padding:12px;
+margin-bottom:12px;
+page-break-inside:avoid;
+break-inside:avoid;
+}
+
+.grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:10px;
+}
+
+.field{
+display:flex;
+flex-direction:column;
+}
+
+label{
+font-size:12px;
+font-weight:700;
+margin-bottom:4px;
+}
+
+input,select{
+padding:8px;
+border:1px solid #ccc;
+border-radius:8px;
+}
+
+.ql-editor{
+min-height:120px;
+overflow:visible!important;
+}
+
+.buttons{
+display:flex;
+gap:10px;
+flex-wrap:wrap;
+margin-top:16px;
+}
+
+button{
+background:#0088cc;
+color:white;
+border:none;
+padding:12px 18px;
+border-radius:10px;
+font-weight:700;
+cursor:pointer;
+}
+
+.hidden{
+display:none;
+}
+
+@media(max-width:900px){
+.grid{grid-template-columns:1fr 1fr}
+#a4{width:100%;padding:10px}
+}
+
+@media(max-width:600px){
+.grid{grid-template-columns:1fr}
+}
+
 </style>
 </head>
+
 <body>
 
-<div class="top">PARTES DIARIOS V8.1</div>
+<div class="top">PARTES DIARIOS V9</div>
 
 <div class="wrap">
 
 <div id="a4">
 
-<div class="print-header">PARTES DIARIOS</div>
+<div class="print-header">
+PARTES DIARIOS
+</div>
 
 <div class="card">
 
@@ -131,14 +229,24 @@ year:'numeric'
 });
 
 function toggleProyecto(){
+
 if(tipo.value==='Proyecto'){
 proyectoBox.classList.remove('hidden');
 }else{
 proyectoBox.classList.add('hidden');
 }
+
 }
 
 toggleProyecto();
+
+function nombreArchivo(){
+
+const fechaArchivo = new Date().toISOString().split('T')[0];
+
+return `Parte_${tipo.value}_${fechaArchivo}`;
+
+}
 
 function guardar(){
 
@@ -154,7 +262,7 @@ incidencias:q2.root.innerHTML,
 observaciones:q3.root.innerHTML
 };
 
-localStorage.setItem('partesv81',JSON.stringify(datos));
+localStorage.setItem('partesv9',JSON.stringify(datos));
 
 alert('Guardado correctamente');
 
@@ -162,7 +270,7 @@ alert('Guardado correctamente');
 
 window.onload = ()=>{
 
-const d = JSON.parse(localStorage.getItem('partesv81'));
+const d = JSON.parse(localStorage.getItem('partesv9'));
 
 if(d){
 
@@ -192,11 +300,31 @@ e.style.height='auto';
 const element = document.getElementById('a4');
 
 await html2pdf().set({
-margin:[5,5,5,5],
-filename:'Parte_Diario.pdf',
-html2canvas:{scale:2},
-jsPDF:{unit:'mm',format:'a4',orientation:'portrait'},
-pagebreak:{mode:['avoid-all','css']}
+
+margin:[2,2,2,2],
+
+filename:nombreArchivo()+'.pdf',
+
+image:{
+type:'jpeg',
+quality:1
+},
+
+html2canvas:{
+scale:2,
+scrollY:0
+},
+
+jsPDF:{
+unit:'mm',
+format:'a4',
+orientation:'portrait'
+},
+
+pagebreak:{
+mode:['avoid-all','css']
+}
+
 }).from(element).save();
 
 }
@@ -223,8 +351,11 @@ ${q3.getText()}
 const blob = new Blob([contenido],{type:'application/msword'});
 
 const a = document.createElement('a');
+
 a.href = URL.createObjectURL(blob);
-a.download = 'Parte_Diario.doc';
+
+a.download = nombreArchivo()+'.doc';
+
 a.click();
 
 }
@@ -247,7 +378,7 @@ ${q3.getText()}
 `;
 
 window.location.href =
-`mailto:?subject=Parte Diario&body=${encodeURIComponent(body)}`;
+`mailto:?subject=${encodeURIComponent(nombreArchivo())}&body=${encodeURIComponent(body)}`;
 
 }
 
