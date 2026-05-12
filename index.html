@@ -3,16 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Partes Diarios V7</title>
+<title>Partes Diarios V8</title>
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
 
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-<script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 
 <style>
+
 body{
 margin:0;
 font-family:'Segoe UI',sans-serif;
@@ -22,30 +21,25 @@ color:#1e293b;
 
 .header{
 background:#0088cc;
-padding:10px;
-text-align:center;
 color:white;
--webkit-print-color-adjust: exact;
-print-color-adjust: exact;
-}
-
-.header h1{
-margin:0;
-font-size:22px;
+text-align:center;
+padding:10px;
 }
 
 .container{
-max-width:1200px;
+max-width:1100px;
 margin:auto;
-padding:14px;
+padding:16px;
 }
 
 .card{
 background:white;
-border-radius:16px;
+border-radius:14px;
 padding:16px;
 margin-bottom:14px;
-box-shadow:0 4px 16px rgba(0,0,0,.08);
+box-shadow:0 3px 10px rgba(0,0,0,.08);
+page-break-inside:avoid;
+break-inside:avoid;
 }
 
 .grid{
@@ -66,22 +60,28 @@ margin-bottom:4px;
 }
 
 input,select{
-width:100%;
 padding:10px;
 border-radius:10px;
 border:1px solid #d0d7e2;
-box-sizing:border-box;
+font-size:14px;
 }
 
 .editor{
 min-height:180px;
+background:white;
+}
+
+.ql-editor{
+min-height:140px;
+overflow:visible!important;
+font-size:14px;
 }
 
 .buttons{
 display:flex;
 flex-wrap:wrap;
 gap:10px;
-margin-top:16px;
+margin-top:18px;
 }
 
 button{
@@ -90,8 +90,8 @@ color:white;
 border:none;
 padding:12px 18px;
 border-radius:12px;
-font-weight:600;
 cursor:pointer;
+font-weight:600;
 }
 
 button.secondary{
@@ -102,36 +102,59 @@ background:#64748b;
 display:none;
 }
 
-.ql-editor{
-min-height:140px;
-font-size:14px;
-overflow:visible!important;
+#a4{
+width:210mm;
+min-height:297mm;
+background:white;
+margin:auto;
+box-sizing:border-box;
+padding:10mm;
 }
 
-#printArea{
-background:white;
-padding:10px;
+.print-header{
+background:#0088cc;
+color:white;
+padding:8px;
+text-align:center;
+font-size:22px;
+font-weight:bold;
+margin-bottom:16px;
+-webkit-print-color-adjust:exact;
+print-color-adjust:exact;
 }
 
 @media(max-width:900px){
-.grid{grid-template-columns:1fr 1fr;}
+.grid{
+grid-template-columns:1fr 1fr;
+}
+#a4{
+width:100%;
+padding:10px;
+}
 }
 
 @media(max-width:600px){
-.grid{grid-template-columns:1fr;}
+.grid{
+grid-template-columns:1fr;
 }
+}
+
 </style>
 </head>
 
 <body>
 
-<div id="printArea">
-
 <div class="header">
-<h1>PARTES DIARIOS</h1>
+<h2>PARTES DIARIOS V8</h2>
 </div>
 
 <div class="container">
+
+<div id="a4">
+
+<div class="print-header">
+PARTES DIARIOS
+</div>
 
 <div class="card">
 
@@ -197,16 +220,28 @@ padding:10px;
 
 </div>
 
-</div>
-
-<div class="container">
-
 <div class="buttons">
-<button onclick="guardarJSON()">Guardar JSON</button>
-<button onclick="exportarPDF()">Exportar PDF</button>
-<button onclick="exportarDOCX()">Exportar DOCX</button>
-<button onclick="abrirOutlook()">Outlook</button>
-<button class="secondary" onclick="limpiar()">Limpiar</button>
+
+<button onclick="guardarLocal()">
+Guardar
+</button>
+
+<button onclick="guardarComo()">
+Guardar en...
+</button>
+
+<button onclick="exportarPDF()">
+Exportar PDF
+</button>
+
+<button onclick="abrirOutlook()">
+Outlook
+</button>
+
+<button class="secondary" onclick="limpiar()">
+Limpiar
+</button>
+
 </div>
 
 </div>
@@ -225,16 +260,19 @@ year:'numeric'
 });
 
 function toggleProyecto(){
+
 if(tipo.value==='Proyecto'){
 proyectoBox.classList.remove('hidden');
 }else{
 proyectoBox.classList.add('hidden');
 }
+
 }
 
 toggleProyecto();
 
 function datos(){
+
 return{
 tipo:tipo.value,
 proyecto:numProyecto.value,
@@ -246,99 +284,107 @@ trabajos:q1.root.innerHTML,
 incidencias:q2.root.innerHTML,
 observaciones:q3.root.innerHTML
 };
+
 }
 
-function nombreBase(){
+function nombreArchivo(){
+
 const f = new Date().toISOString().split('T')[0];
+
 return `Parte_${tipo.value}_${f}`;
+
 }
 
-function guardarJSON(){
+function guardarLocal(){
 
-const blob = new Blob(
-[JSON.stringify(datos(),null,2)],
-{type:'application/json'}
+localStorage.setItem(
+'parteDiarioV8',
+JSON.stringify(datos())
 );
 
-saveAs(blob, nombreBase()+'.json');
+alert('Guardado correctamente');
+
+}
+
+async function guardarComo(){
+
+const contenido = JSON.stringify(datos(),null,2);
+
+const blob = new Blob([contenido],{type:'application/json'});
+
+if(window.showSaveFilePicker){
+
+const handle = await window.showSaveFilePicker({
+suggestedName:nombreArchivo()+'.json',
+types:[{
+description:'JSON',
+accept:{'application/json':['.json']}
+}]
+});
+
+const writable = await handle.createWritable();
+
+await writable.write(blob);
+
+await writable.close();
+
+alert('Archivo guardado');
+
+}else{
+
+const a = document.createElement('a');
+
+a.href = URL.createObjectURL(blob);
+
+a.download = nombreArchivo()+'.json';
+
+a.click();
+
+}
 
 }
 
 async function exportarPDF(){
 
 document.querySelectorAll('.ql-editor').forEach(e=>{
+
 e.style.height='auto';
 e.style.overflow='visible';
+
 });
 
-const element = document.getElementById('printArea');
+const element = document.getElementById('a4');
 
-const opt = {
-margin:0.5,
-filename:nombreBase()+'.pdf',
-image:{type:'jpeg',quality:1},
-html2canvas:{scale:2,useCORS:true},
-jsPDF:{unit:'in',format:'a4',orientation:'portrait'}
-};
+const options = {
 
-await html2pdf().set(opt).from(element).save();
+margin:[5,5,5,5],
 
+filename:nombreArchivo()+'.pdf',
+
+image:{
+type:'jpeg',
+quality:1
+},
+
+html2canvas:{
+scale:2,
+useCORS:true,
+scrollY:0
+},
+
+jsPDF:{
+unit:'mm',
+format:'a4',
+orientation:'portrait'
+},
+
+pagebreak:{
+mode:['avoid-all','css','legacy']
 }
 
-async function exportarDOCX(){
+};
 
-const d = datos();
-
-const { Document, Packer, Paragraph, TextRun, HeadingLevel } = docx;
-
-const doc = new Document({
-sections:[{
-properties:{},
-children:[
-
-new Paragraph({
-text:'PARTES DIARIOS',
-heading:HeadingLevel.TITLE
-}),
-
-new Paragraph({
-children:[new TextRun({text:`Responsable: ${d.responsable}`,bold:true})]
-}),
-
-new Paragraph(`Fecha: ${d.fecha}`),
-new Paragraph(`Tipo: ${d.tipo}`),
-new Paragraph(`Proyecto: ${d.proyecto}`),
-new Paragraph(`Turno: ${d.turno}`),
-new Paragraph(`Horas: ${d.horas}`),
-
-new Paragraph({
-text:'Trabajos realizados',
-heading:HeadingLevel.HEADING_1
-}),
-
-new Paragraph(q1.getText()),
-
-new Paragraph({
-text:'Incidencias',
-heading:HeadingLevel.HEADING_1
-}),
-
-new Paragraph(q2.getText()),
-
-new Paragraph({
-text:'Observaciones',
-heading:HeadingLevel.HEADING_1
-}),
-
-new Paragraph(q3.getText())
-
-]
-}]
-});
-
-const blob = await Packer.toBlob(doc);
-
-saveAs(blob, nombreBase()+'.docx');
+await html2pdf().set(options).from(element).save();
 
 }
 
@@ -346,7 +392,8 @@ function abrirOutlook(){
 
 const d = datos();
 
-const asunto = `Parte Diario - ${d.tipo} - ${d.fecha}`;
+const asunto =
+`Parte Diario - ${d.tipo} - ${d.fecha}`;
 
 const cuerpo = `
 Responsable: ${d.responsable}
@@ -357,14 +404,7 @@ Turno: ${d.turno}
 
 Horas: ${d.horas}
 
-TRABAJOS:
-${q1.getText()}
-
-INCIDENCIAS:
-${q2.getText()}
-
-OBSERVACIONES:
-${q3.getText()}
+(Adjuntar PDF generado)
 `;
 
 window.location.href =
@@ -374,7 +414,7 @@ window.location.href =
 
 function limpiar(){
 
-if(confirm('¿Eliminar todos los datos?')){
+if(confirm('¿Eliminar datos?')){
 
 localStorage.clear();
 
@@ -387,7 +427,7 @@ location.reload();
 window.onload = ()=>{
 
 const saved =
-JSON.parse(localStorage.getItem('parteDiarioV7'));
+JSON.parse(localStorage.getItem('parteDiarioV8'));
 
 if(saved){
 
@@ -407,15 +447,6 @@ toggleProyecto();
 }
 
 }
-
-window.addEventListener('beforeunload',()=>{
-
-localStorage.setItem(
-'parteDiarioV7',
-JSON.stringify(datos())
-);
-
-});
 
 </script>
 
