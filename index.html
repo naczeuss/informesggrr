@@ -4,10 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Partes Diarios V9</title>
+<title>Partes Diarios V10 Compact</title>
 
 <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
 <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
@@ -17,56 +16,44 @@ body{
 margin:0;
 font-family:Segoe UI,sans-serif;
 background:#eef3f8;
+font-size:13px;
 }
 
 .top{
 background:#0088cc;
 color:white;
-padding:12px;
+padding:6px;
 text-align:center;
-font-size:22px;
-font-weight:bold;
+font-size:18px;
+font-weight:700;
 }
 
 .wrap{
-max-width:1100px;
+max-width:1000px;
 margin:auto;
-padding:15px;
+padding:8px;
 }
 
 #a4{
-width:180mm;
+width:182mm;
 background:white;
-margin:0 auto;
-padding:8mm;
+margin:auto;
+padding:5mm;
 box-sizing:border-box;
 }
 
-.print-header{
-background:#0088cc;
-color:white;
-padding:8px;
-text-align:center;
-font-size:22px;
-font-weight:bold;
-margin-bottom:12px;
--webkit-print-color-adjust:exact;
-print-color-adjust:exact;
-}
-
 .card{
-border:1px solid #d7d7d7;
-border-radius:10px;
-padding:12px;
-margin-bottom:12px;
+border:1px solid #d8d8d8;
+border-radius:6px;
+padding:6px;
+margin-bottom:6px;
 page-break-inside:avoid;
-break-inside:avoid;
 }
 
 .grid{
 display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:10px;
+grid-template-columns:repeat(6,1fr);
+gap:6px;
 }
 
 .field{
@@ -75,35 +62,57 @@ flex-direction:column;
 }
 
 label{
-font-size:12px;
+font-size:11px;
 font-weight:700;
-margin-bottom:4px;
+margin-bottom:2px;
+color:#444;
 }
 
 input,select{
-padding:8px;
-border:1px solid #ccc;
-border-radius:8px;
+padding:5px;
+border:1px solid #cfcfcf;
+border-radius:5px;
+font-size:12px;
+}
+
+.section-title{
+font-size:12px;
+font-weight:700;
+margin-bottom:4px;
+color:#0088cc;
+}
+
+.ql-toolbar{
+padding:2px !important;
+}
+
+.ql-toolbar button{
+width:22px !important;
+height:22px !important;
 }
 
 .ql-editor{
-min-height:120px;
-overflow:visible!important;
+min-height:70px;
+font-size:12px;
+padding:6px !important;
+overflow:visible !important;
+line-height:1.25;
 }
 
 .buttons{
 display:flex;
-gap:10px;
+gap:8px;
 flex-wrap:wrap;
-margin-top:16px;
+margin-top:10px;
 }
 
 button{
 background:#0088cc;
 color:white;
 border:none;
-padding:12px 18px;
-border-radius:10px;
+padding:8px 12px;
+border-radius:8px;
+font-size:12px;
 font-weight:700;
 cursor:pointer;
 }
@@ -112,13 +121,31 @@ cursor:pointer;
 display:none;
 }
 
+.print-header{
+background:#0088cc;
+color:white;
+padding:5px;
+text-align:center;
+font-size:18px;
+font-weight:700;
+margin-bottom:6px;
+-webkit-print-color-adjust:exact;
+print-color-adjust:exact;
+}
+
 @media(max-width:900px){
-.grid{grid-template-columns:1fr 1fr}
-#a4{width:100%;padding:10px}
+.grid{
+grid-template-columns:1fr 1fr;
+}
+#a4{
+width:100%;
+}
 }
 
 @media(max-width:600px){
-.grid{grid-template-columns:1fr}
+.grid{
+grid-template-columns:1fr;
+}
 }
 
 </style>
@@ -126,14 +153,16 @@ display:none;
 
 <body>
 
-<div class="top">PARTES DIARIOS V9</div>
+<div class="top">
+PARTES DIARIOS V10 COMPACT
+</div>
 
 <div class="wrap">
 
 <div id="a4">
 
 <div class="print-header">
-PARTES DIARIOS
+PARTE DIARIO
 </div>
 
 <div class="card">
@@ -149,7 +178,7 @@ PARTES DIARIOS
 </div>
 
 <div class="field hidden" id="proyectoBox">
-<label>Nº Proyecto</label>
+<label>Proyecto</label>
 <input id="numProyecto">
 </div>
 
@@ -184,17 +213,17 @@ PARTES DIARIOS
 </div>
 
 <div class="card">
-<label>Trabajos realizados</label>
+<div class="section-title">Trabajos realizados</div>
 <div id="editor1"></div>
 </div>
 
 <div class="card">
-<label>Incidencias</label>
+<div class="section-title">Incidencias</div>
 <div id="editor2"></div>
 </div>
 
 <div class="card">
-<label>Observaciones</label>
+<div class="section-title">Observaciones</div>
 <div id="editor3"></div>
 </div>
 
@@ -202,8 +231,8 @@ PARTES DIARIOS
 
 <div class="buttons">
 <button onclick="guardar()">Guardar</button>
-<button onclick="exportarPDF()">Guardar PDF</button>
-<button onclick="guardarDOC()">Guardar DOC</button>
+<button onclick="exportarPDF()">PDF</button>
+<button onclick="guardarDOC()">DOC</button>
 <button onclick="outlook()">Outlook</button>
 </div>
 
@@ -212,19 +241,29 @@ PARTES DIARIOS
 <script>
 
 const toolbar = [
-['bold','italic','underline'],
+['bold','italic'],
 [{color:[]}],
-[{list:'ordered'},{list:'bullet'}]
+[{list:'bullet'}]
 ];
 
-const q1 = new Quill('#editor1',{theme:'snow',modules:{toolbar}});
-const q2 = new Quill('#editor2',{theme:'snow',modules:{toolbar}});
-const q3 = new Quill('#editor3',{theme:'snow',modules:{toolbar}});
+const q1 = new Quill('#editor1',{
+theme:'snow',
+modules:{toolbar}
+});
+
+const q2 = new Quill('#editor2',{
+theme:'snow',
+modules:{toolbar}
+});
+
+const q3 = new Quill('#editor3',{
+theme:'snow',
+modules:{toolbar}
+});
 
 fecha.value = new Date().toLocaleDateString('es-ES',{
-weekday:'long',
-day:'numeric',
-month:'long',
+day:'2-digit',
+month:'2-digit',
 year:'numeric'
 });
 
@@ -242,9 +281,9 @@ toggleProyecto();
 
 function nombreArchivo(){
 
-const fechaArchivo = new Date().toISOString().split('T')[0];
+const f = new Date().toISOString().split('T')[0];
 
-return `Parte_${tipo.value}_${fechaArchivo}`;
+return `Parte_${tipo.value}_${f}`;
 
 }
 
@@ -262,15 +301,15 @@ incidencias:q2.root.innerHTML,
 observaciones:q3.root.innerHTML
 };
 
-localStorage.setItem('partesv9',JSON.stringify(datos));
+localStorage.setItem('partesv10',JSON.stringify(datos));
 
-alert('Guardado correctamente');
+alert('Guardado');
 
 }
 
 window.onload = ()=>{
 
-const d = JSON.parse(localStorage.getItem('partesv9'));
+const d = JSON.parse(localStorage.getItem('partesv10'));
 
 if(d){
 
@@ -297,11 +336,9 @@ document.querySelectorAll('.ql-editor').forEach(e=>{
 e.style.height='auto';
 });
 
-const element = document.getElementById('a4');
-
 await html2pdf().set({
 
-margin:[2,2,2,2],
+margin:[1,1,1,1],
 
 filename:nombreArchivo()+'.pdf',
 
@@ -319,13 +356,9 @@ jsPDF:{
 unit:'mm',
 format:'a4',
 orientation:'portrait'
-},
-
-pagebreak:{
-mode:['avoid-all','css']
 }
 
-}).from(element).save();
+}).from(document.getElementById('a4')).save();
 
 }
 
@@ -335,27 +368,23 @@ const contenido = `
 PARTE DIARIO
 
 Responsable: ${responsable.value}
-
 Fecha: ${fecha.value}
 
-Trabajos:
+TRABAJOS
 ${q1.getText()}
 
-Incidencias:
+INCIDENCIAS
 ${q2.getText()}
 
-Observaciones:
+OBSERVACIONES
 ${q3.getText()}
 `;
 
 const blob = new Blob([contenido],{type:'application/msword'});
 
 const a = document.createElement('a');
-
 a.href = URL.createObjectURL(blob);
-
 a.download = nombreArchivo()+'.doc';
-
 a.click();
 
 }
@@ -365,15 +394,13 @@ function outlook(){
 const body = `
 Responsable: ${responsable.value}
 
-Fecha: ${fecha.value}
-
-Trabajos:
+TRABAJOS:
 ${q1.getText()}
 
-Incidencias:
+INCIDENCIAS:
 ${q2.getText()}
 
-Observaciones:
+OBSERVACIONES:
 ${q3.getText()}
 `;
 
