@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PARTE DIARIO GGRR</title>
+
+https://cdn.quilljs.com/1.3.6/quill.snow.css
+js.com/1.3.6/quill.js"></script>
+://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<style>
+body{margin:0;font-family:Segoe UI,sans-serif;background:#eef3f8;font-size:13px}
+.wrap{max-width:1000px;margin:auto;padding:10px}
+#a4{background:white;padding:6mm;border-radius:6px}
+.print-header{background:#0088cc;color:white;padding:7px;text-align:center;font-size:18px;font-weight:700;margin-bottom:8px;border-radius:6px}
+.card{border:1px solid #d8d8d8;border-radius:8px;padding:8px;margin-bottom:8px;background:white}
+.grid{display:grid;grid-template-columns:90px 1fr 110px 120px 60px;gap:8px;align-items:end}
+.grid-proyecto{display:grid;grid-template-columns:90px 110px 1fr 110px 120px 60px;gap:8px;align-items:end}
+.field{display:flex;flex-direction:column}
+label{font-size:11px;font-weight:700;margin-bottom:3px;color:#444}
+input,select{padding:7px;border:1px solid #cfcfcf;border-radius:6px;font-size:12px}
+.buttons{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+button{background:#0088cc;color:white;border:none;padding:9px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+.danger{background:#c0392b}
+.hidden{display:none}
+</style>
+</head>
+
+<body>
+<div class="wrap">
+<div id="a4">
+
+<div class="print-header" id="tituloParte">PARTE DIARIO GGRR</div>
+
+<div class="card">
+<div id="contenedorGrid" class="grid">
+
+<div class="field">
+<label>Tipo</label>
+<select id="tipo" onchange="actualizarVista()">
+<option>GGRR</option>
+<option>Proyecto</option>
+</select>
+</div>
+
+<div class="field hidden" id="proyectoBox">
+<label>Proyecto</label>
+<input id="numProyecto">
+</div>
+
+<div class="field">
+<label>Responsable</label>
+<input id="responsable">
+</div>
+
+<div class="field">
+<label>Fecha</label>
+<input id="fecha">
+</div>
+
+<div class="field">
+<label>Turno</label>
+<select id="turno">
+<option>Mañana</option>
+<option>Tarde</option>
+<option>Noche</option>
+<option>Sol</option>
+<option>Luna</option>
+</select>
+</div>
+
+<div class="field">
+<label>Horas</label>
+<input type="number" id="horas">
+</div>
+
+</div>
+</div>
+
+<div class="card">
+<div class="section-title">Trabajos realizados</div>
+<div id="editor1"></div>
+</div>
+
+<div class="card">
+<div class="section-title">Incidencias</div>
+<div id="editor2"></div>
+</div>
+
+<div class="card">
+<div class="section-title">Observaciones</div>
+<div id="editor3"></div>
+</div>
+
+</div>
+
+<div class="buttons">
+<button onclick="guardar()">Guardar</button>
+<button onclick="nuevoParte()" class="danger">Nuevo parte</button>
+<button onclick="exportarPDF()">PDF</button>
+<button onclick="outlook()">Outlook</button>
+</div>
+
+</div>
+
+<script>
+const toolbar = [['bold','italic','underline'],[{color:[]}],[{list:'bullet'}]];
+let q1,q2,q3;
+
+if(window.Quill){
+  q1=new Quill('#editor1',{theme:'snow',modules:{toolbar}});
+  q2=new Quill('#editor2',{theme:'snow',modules:{toolbar}});
+  q3=new Quill('#editor3',{theme:'snow',modules:{toolbar}});
+}
+
+fecha.value = new Date().toISOString().split('T')[0];
+
+function actualizarVista(){
+  tituloParte.innerText='PARTE DIARIO '+tipo.value.toUpperCase();
+  const p=tipo.value==='Proyecto';
+  proyectoBox.classList.toggle('hidden',!p);
+  contenedorGrid.className=p?'grid-proyecto':'grid';
+}
+
+actualizarVista();
+
+function nombreArchivo(){
+  const f=new Date().toISOString().split('T')[0];
+  const r=responsable.value.trim().replace(/\s+/g,'_');
+  return `Parte_${tipo.value}_${f}_${r}`;
+}
+
+function guardar(){
+  localStorage.setItem('parte_v13',JSON.stringify({
+    tipo:tipo.value,proyecto:numProyecto.value,responsable:responsable.value,
+    fecha:fecha.value,turno:turno.value,horas:horas.value,
+    trabajos:q1?q1.root.innerHTML:'',incidencias:q2?q2.root.innerHTML:'',
+    observaciones:q3?q3.root.innerHTML:''
+  }));
+  alert('Parte guardado');
+}
+
+function nuevoParte(){
+  if(!confirm('¿Seguro que quieres iniciar un nuevo parte?'))return;
+  localStorage.removeItem('parte_v13');
+  document.querySelectorAll('input').forEach(i=>i.value='');
+  if(q1){q1.root.innerHTML='';q2.root.innerHTML='';q3.root.innerHTML='';}
+  fecha.value=new Date().toISOString().split('T')[0];
+  actualizarVista();
+}
+
+function exportarPDF(){
+  html2pdf().set({
+    filename:nombreArchivo()+'.pdf',
+    margin:2,
+    html2canvas:{scale:2},
+    jsPDF:{unit:'mm',format:'a4'}
+  }).from(a4).save();
+}
+
+function outlook(){
+  const body=`Responsable: ${responsable.value}\nFecha: ${fecha.value}\n\nTRABAJOS:\n${q1.getText()}\n\nINCIDENCIAS:\n${q2.getText()}\n\nOBSERVACIONES:\n${q3.getText()}`;
+  window.location.href=`mailto:?subject=${encodeURIComponent(nombreArchivo())}&body=${encodeURIComponent(body)}`;
+}
+
+window.onload=()=>{
+  const d=JSON.parse(localStorage.getItem('parte_v13'));
+  if(!d)return;
+  tipo.value=d.tipo;numProyecto.value=d.proyecto;responsable.value=d.responsable;
+  fecha.value=d.fecha;turno.value=d.turno;horas.value=d.horas;
+  if(q1){q1.root.innerHTML=d.trabajos;q2.root.innerHTML=d.incidencias;q3.root.innerHTML=d.observaciones;}
+  actualizarVista();
+};
+</script>
+
+</body>
+</html>
