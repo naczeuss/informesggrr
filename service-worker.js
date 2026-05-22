@@ -1,1 +1,0 @@
-{"name":"Partes Diarios V6","display":"standalone"}
